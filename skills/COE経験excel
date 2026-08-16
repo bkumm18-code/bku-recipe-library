@@ -1,5 +1,5 @@
 ---
-name: passport-excel-entry
+name: COE経験excel
 description: Create passport-information Excel documents from passport PDFs or images using the approved BKU formats, fixed field mappings, defaults, multi-person ordering, and output naming rules. Use for new passport lists and corrections.
 ---
 
