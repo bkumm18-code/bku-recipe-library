@@ -1,0 +1,37 @@
+---
+name: coe
+description: Use the COE経験エクセル recipe when the user asks for this workflow.
+---
+
+レシピ01　個人共通のCOE経験エクセルを作る
+
+- 作成者: kanako
+- 部門: checking
+- 発生頻度: (週1)
+- 最終更新: 2026-08-17
+- 使用回数: (月次棚卸しで更新)
+
+## 1. 完成条件(何ができたら終わりか、一行)
+該当フォルダ内のパスポート、Final Excel List、履歴書を読み取ってCOE経験エクセルを作る
+
+## 2. 用意するもの(入力)
+該当グループフォルダまたは各人フォルダとFinal Excel Listをコピー＆desktop貼付け、そのフォルダをプロジェクトフォルダに指定
+
+## 3. プロンプト(コピペでそのまま使える現物。穴埋めは【】で明示)
+いま入ってるフォルダ 
+
+## 4. 良い出力の見本(過去の合格品を一つ、そのまま貼る)
+https://docs.google.com/spreadsheets/d/13Z7BXYVtOpdMZC7_ULRCs2jZhI5zPRjj/edit?usp=sharing&ouid=107706737815674849179&rtpof=true&sd=true
+
+## 5. 送信前チェック(3項目だけ)
+- [ ]名前（アルファベット、フリガナ）、生年月日に間違いがない
+- [ ]黄色セル、オレンジセル箇所に間違いないがない
+- [ ]職歴が正しく入力されている
+
+## 6. よくある失敗と対処(一つだけ)
+空白セルがある。送信前に空白セルがないかチェックし、あれば入力する。
+
+
+## Skill operating rules
+
+Follow the recipe's completion criteria and pre-send checklist. Do not invent missing business rules; ask the owner when required information is absent.
