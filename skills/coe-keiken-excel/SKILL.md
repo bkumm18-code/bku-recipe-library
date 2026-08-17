@@ -1,5 +1,5 @@
 ---
-name: coe
+name: coe-keiken-excel
 description: Use the COE経験エクセル recipe when the user asks for this workflow.
 ---
 
