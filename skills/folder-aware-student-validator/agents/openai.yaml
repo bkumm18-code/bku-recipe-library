@@ -1,0 +1,4 @@
+interface:
+  display_name: Folder-Aware Student Validator
+  short_description: Check copied student folders into one Excel report
+  default_prompt: Validate the copied student/job folder in BKU test and create one consolidated workbook with required documents, passport expiry, medical FIT/UNFIT, certificate presence, and name consistency.
