@@ -22,7 +22,7 @@ JCPS専用。BKU・ごとう/Exceedのテンプレートやセル位置を流用
 - End date: source cell immediately left of the row's `NEXT` status.
 - Round: numeric value in row 4, one column left of that same `NEXT` column; render `<number>回目`. Never hard-code `1回目`.
 - Period start: source date three columns left of `NEXT`; source exceptions override the normal six-month pattern.
-- Leave the detail `取引日` cells blank. In the period column, use exactly `<number>回目\n入国日YYYY/MM/DD\n\nYYYY/MM/DD-YYYY/MM/DD` (no colon after `入国日`). Display the six-month period immediately preceding the current source period: it ends on the source period start and begins six months earlier; source exceptions override the normal six-month pattern.
+- Leave the detail `取引日` cells blank. In the period column, use exactly `<number>回目\n入国日YYYY/MM/DD\n\nYYYY/MM/DD-YYYY/MM/DD` (no colon after `入国日`). Display the current six-month source period, from the source period start through the applicable `NEXT` date; source exceptions override the normal six-month pattern.
 - Headcount: search the complete Group name, including parentheses, for every `数字pax`; use the final occurrence. `5pax 1期生 以後3pax` means 3. An explicit user-confirmed count overrides parsing.
 - Unit price: charge ¥5,000 per trainee per month unless the user explicitly provides a different rate.
 - 摘要C列: Japanese company/group description and eligible trainee names only. Do not display English company names or any `数字pax` text.
@@ -48,4 +48,3 @@ JCPS専用。BKU・ごとう/Exceedのテンプレートやセル位置を流用
 ## Verification
 
 After saving, close and reopen the workbook and verify recipient, blank transaction-date cells, round, entry date, displayed prior six-month period, final-pax headcount, excluded filled names, blank row 15, formulas, totals, and absence of `#VALUE!`, `#REF!`, mojibake, stale rows, and stale historical amounts. If any source cell or mapping is ambiguous, stop and ask instead of guessing.
-
