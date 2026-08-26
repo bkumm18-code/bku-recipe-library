@@ -1,99 +1,50 @@
 ---
-name: kanri-fee-most
-description: Create and correct BKU monitoring-fee invoice workbooks from the 240229 source, Trainee workbook, and dedicated BKU blank template. Use for BKU-specific cooperative grouping, tab sequencing, invoice headers, trainee filtering, periods, headcounts, formulas, and Excel verification.
+name: kanri-fee-jcps
+description: Create and verify JCPS monitoring-fee invoice Excel workbooks from 240229 source data, the Trainee workbook, and the approved JCPS blank template. Use for 日本企業振興協同組合監理費請求書作成・修正.
 ---
 
-# kanri-fee-most
+# kanri-fee-jcps
 
-Create BKU monitoring-fee invoices only. Do not substitute the JCPS or Goto/Exceed templates.
+JCPS専用。BKU・ごとう/Exceedのテンプレートやセル位置を流用しない。
 
-## Required files
+## Files
 
-- Source workbook: the workspace file matching `240229*`.
-- Trainee workbook: the workspace file matching `Trainee*`.
-- Approved blank template: the `.xlsx` asset in this skill's `assets` directory.
-- Always copy the blank asset for a new run. Never modify the approved asset or start from a historical invoice.
+- Source: `240229 監理費 重要.xlsx`
+- Trainee source: `Trainee元気ですか のコピー.xlsx`
+- Template: `C:\Users\acer\.codex\skills\monitoring-fee-invoice\assets\監理費請求書_空テンプレート_JCPS.xlsx`
 
-## Excel execution and text safety
+## Rules
 
-- Use Excel COM as the primary method; VBA is the fallback.
-- Default to a merge-safe template workflow: create every output sheet from a fresh copy of the approved blank template, then populate only that sheet. Do not reuse a prior invoice tab or carry cells forward from another cooperative.
-- Treat merged cells as indivisible. Write and clear only the top-left cell of a merged area; never call `ClearContents`, assign a value, or apply a range operation to a range that intersects only part of a merged area.
-- Prefer leaving unused detail rows in their blank-template state. If clearing is necessary, resolve each field's `MergeArea` first and clear only its top-left cell. Never bulk-clear `C:K` across detail rows.
-- Duplicate sheets only through a tested Excel COM helper with an explicit valid `Before` or `After` worksheet reference. If sheet copying fails, stop that run, close the Excel instance created for it, and retry from a newly copied blank workbook rather than continuing with a partially modified workbook.
-- Keep one Excel instance per run, close every workbook in `finally`, and release only COM references that will not be used again. Do not release the base-template worksheet before all required copies are made.
-- If the intended output is locked, do not overwrite it or terminate an unknown Excel process. Save to a distinct output filename after closing only Excel processes created by the current run.
-- Read IDs, Japanese company/cooperative names, group names, dates, formulas, trainee names, and fill state directly from Excel objects.
-- Do not embed Japanese source values in PowerShell scripts or serialize them through text/intermediate files. This includes worksheet names. Build Japanese worksheet names from source workbook cell values.
-- Normalize only the ASCII/full-width `m` prefix when matching IDs; compare the numeric portion and preserve displayed source text.
-- Save, close, and reopen the output in Excel before delivery. Compare displayed Japanese sheet names and key values after reopening. A mojibake sheet name is a failed output.
+- Filter rows whose applicable `NEXT` date is in the requested month.
+- Combine all matching JCPS groups into one invoice tab.
+- Tab name: `YYMMNN 日本企業振興`; `NN` is the sequence by ascending applicable date. September 2026 is `260901 日本企業振興`.
+- Use the official Japanese cooperative name in the recipient field.
+- End date: source cell immediately left of the row's `NEXT` status.
+- Round: numeric value in row 4, one column left of that same `NEXT` column; render `<number>回目`. Never hard-code `1回目`.
+- Period start: source date three columns left of `NEXT`; source exceptions override the normal six-month pattern.
+- Leave the detail `取引日` cells blank. In the period column, use exactly `<number>回目\n入国日YYYY/MM/DD\n\nYYYY/MM/DD-YYYY/MM/DD` (no colon after `入国日`). Display the current six-month source period, from the source period start through the applicable `NEXT` date; source exceptions override the normal six-month pattern.
+- Headcount: search the complete Group name, including parentheses, for every `数字pax`; use the final occurrence. `5pax 1期生 以後3pax` means 3. An explicit user-confirmed count overrides parsing.
+- Unit price: charge ¥5,000 per trainee per month unless the user explicitly provides a different rate.
+- 摘要C列: Japanese company/group description and eligible trainee names only. Do not display English company names or any `数字pax` text.
+- 摘要C列の表示形式: 1行目に日本語会社名・グループ名、2行目以降に実習生名をセル内改行で表示する。会社名と実習生名を同じ行に連結しない。
 
-## Scope and grouping
+## Trainees
 
-- Include only rows whose applicable `NEXT` date is in the requested month.
-- Skip rows without a valid `NEXT` cell before reading round/start/end columns.
-- Route only BKU-managed cooperatives; exclude JCPS and Goto/Exceed records.
-- Combine all matching groups for one cooperative into one invoice tab, even when their applicable dates differ.
-- Sequence cooperatives by ascending earliest applicable `NEXT` date: `01`, `02`, `03`...
-
-## Tab names and order
-
-- Tab name format: `YYMMNN cooperative-name`.
-- `YYMM` is the requested year/month; `NN` is the cooperative sequence, not the literal NEXT calendar day.
-- Example for October 2026: `261001`, `261002`, `261003`...
-- Remove the suffix `協同組合` and adjacent spaces from the displayed cooperative name; preserve the remaining official Japanese text.
-- Order tabs left-to-right by sequence descending: `...03`, `...02`, `...01`. Thus the earliest cooperative is the rightmost tab.
-- Keep sheet names within Excel's 31-character limit using deterministic Japanese-safe shortening only when required.
-
-## Recipient and invoice header
-
-- Write the official Japanese cooperative name to the template recipient cell.
-- Invoice date follows the tab prefix sequence: `261001` -> `2026/10/01`, `261002` -> `2026/10/02`, `261003` -> `2026/10/03`.
-- Invoice number is `INV-` plus the six-digit tab prefix: `INV-261001`, `INV-261002`, `INV-261003`.
-- Preserve the template's date/number labels and write values to the template's designated value cells.
-
-## Detail source mapping
-
-- Read date cells from their underlying Excel value (`Value2`) and format them as `yyyy/MM/dd`; do not trust `.Text` when the source column is too narrow, because Excel may return `########`.
-- End date: source cell immediately left of the row's `NEXT` cell.
-- Period start: source cell three columns left of that `NEXT` cell. Source exceptions override calculated dates.
-- Round: numeric value in row 4, one column left of the same `NEXT` cell. Render as an integer followed by `回目`; never `2.00回目` or `回目回目`.
-- Period field includes the round, `入国日：YYYY/MM/DD`, and `start-date-end-date`.
-- Headcount: find every `number + pax` occurrence in the complete Group name, including parentheses/brackets, and use the final occurrence. A user-confirmed count overrides parsing.
-
-## Summary and trainees
-
-- Summary first line: Japanese company name from the source company column only. Do not include Group-name text, English company names, IDs, or pax text.
-- Later lines: eligible trainee names from the matching `mNNN` worksheet, separated with real Excel line feeds; enable WrapText.
-- Read candidate names from column A cells whose displayed text begins with a numeric sequence such as `01 `.
-- Include only cells with `Interior.ColorIndex = -4142` (no fill). Exclude every filled/background-colored name cell; font color alone does not exclude a name.
+- Read names from the matching `mNNN` sheet in `Trainee元気ですか のコピー.xlsx`.
+- Exclude any name cell with any fill/background color. Font color alone is irrelevant.
 - Never invent or translate names.
 
-## Detail rows, formatting, and formulas
+## JCPS template handling
 
-- Inspect the blank template's actual merged areas and write only to merged-area top-left cells.
-- Set every populated or formula-bearing cell in the detail fields from Summary through Detail Amount (`C:K`, standard rows `21:35`) to font `ＭＳ ゴシック`, size `9 pt`. This applies to Summary, Period, Quantity (months), Headcount, Unit Price, and Detail Amount.
-- Clear copied/stale detail contents before writing. Clear each merged area separately.
-- After filtering, clear summary, period, quantity, headcount, unit price, and amount values/formulas from every unused detail row. Do not leave values from another cooperative.
-- Copy only formatting from the preceding populated detail row to the final populated row when needed; do not copy values or formulas.
-- Preserve the template quantity/unit-price convention and set each detail amount formula from that row's quantity, headcount, and unit-price cells.
+- Always copy the blank JCPS asset; never start from a historical invoice.
+- Inspect merged areas and write each field to the correct merged area's top-left cell.
+- Recipient must be written to the actual JCPS recipient cell.
+- In the JCPS template, write the cooperative recipient to `B3`. Preserve the template labels `請求日` in `H3` and `請求書番号` in `H4`; write the invoice date as `yyyy/mm/dd` to `K3` and the invoice number to `K4`, with K3/K4 right-aligned.
+- For September 2026 use invoice date `2026/09/01` and invoice number `INV-2609`.
+- Clear row 15's historical values/formulas; do not leave a stale total there.
+- Preserve the JCPS layout, formulas, borders, and number formats.
+- Preserve the blank-template total formula in `K30` (`=SUM(K20:K23)`); after populating details, verify that K30 remains a formula and equals the detail total.
 
-## BKU totals
+## Verification
 
-- `K37` is the detail subtotal and must contain `=SUM(K21:K35)` in the standard layout.
-- `E15` is the invoice amount and must contain `=K37`.
-- `K30` must be blank.
-- `K15` must be blank. Never use K15 as the invoice amount.
-
-## Final verification
-
-After reopening the saved workbook, verify every tab:
-
-- Japanese tab name, six-digit prefix, descending tab order, recipient, invoice date, and invoice number.
-- Correct cooperative grouping with no rows or numeric remnants from other cooperatives.
-- Japanese-only company summary, eligible trainee names, integer round, entry/start/end dates, final-pax headcount, and line breaks.
-- Detail formulas, `K37`, `E15`, blank `K30`, blank `K15`, and correct totals.
-- Font `ＭＳ ゴシック`, size `9 pt`, across Summary, Period, Quantity, Headcount, Unit Price, and Detail Amount cells.
-- No mojibake, stale rows, `#VALUE!`, or `#REF!`.
-
-Do not deliver the workbook when reopen validation differs from what was written.
+After saving, close and reopen the workbook and verify recipient, blank transaction-date cells, round, entry date, displayed prior six-month period, final-pax headcount, excluded filled names, blank row 15, formulas, totals, and absence of `#VALUE!`, `#REF!`, mojibake, stale rows, and stale historical amounts. If any source cell or mapping is ambiguous, stop and ask instead of guessing.
