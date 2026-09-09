@@ -1,0 +1,4 @@
+interface:
+  display_name: "Japan Student Visa Application"
+  short_description: "Create and verify Japan student visa PDFs"
+  default_prompt: "Use $japan-student-visa-application to create verified Japan visa application PDFs from student source documents."
