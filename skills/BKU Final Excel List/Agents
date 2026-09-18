@@ -1,3 +1,0 @@
-interface:
-  display_name: "BKU CV Sheet Cleanup"
-  short_description: "Clean BKU CV lists and deliver a final Excel file"
