@@ -1,0 +1,3 @@
+interface:
+  display_name: "BKU Final Excel List"
+  short_description: "Create and clean BKU final Excel lists"
