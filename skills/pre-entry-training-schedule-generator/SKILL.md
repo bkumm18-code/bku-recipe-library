@@ -20,7 +20,6 @@ When asked to create a record from a project folder, locate and read the relevan
 - Do not perform a separate total-hours reconciliation for nursing-care classification or subject extraction.
 - For a non-nursing-care case, read the subject names, sequence, and planned hours from `共通` > `入国前講習実施（予定）表` as usual.
 - Require the user to provide the entry date for every group, even if an older document contains another entry date. Never infer or reuse it.
-- Require the user to provide the final interview-passed date for every group. Use it to determine which implementation-period case applies; do not infer or reuse it from a prior record.
 - Treat the user-provided entry date as group-specific input and use it for implementation-period handling and the appendix; do not extract or reuse an entry date from a prior record.
 - If the planned schedule table, pledge, or trainee folders cannot be found or read, list the missing source and stop before generating the document.
 
@@ -31,10 +30,9 @@ When asked to create a record from a project folder, locate and read the relevan
 - Preserve every subject, sequence, and total hour count from the planned schedule. Do not use an eight-subject/equal-40-hour default.
 - Implementation-period rule:
   - First use the period written in `参考様式第１-29号` as the approved period.
-  - If the period's start date is later than the final interview-passed date and the interval from the final interview-passed date to entry is less than six months, keep the approved period. The chronological order is: entry-date-minus-six-months, final interview passed, course start, course end, entry.
-  - If the approved period's start date is earlier than the calendar date six months before entry, move the course start date to the calendar date six months before entry and move the course end date later by the same number of calendar days. The chronological order is: final interview passed, adjusted course start at entry-date-minus-six-months, adjusted course end, entry.
+  - If the approved period's start date is earlier than the calendar date six months before entry, move the course start date to the calendar date six months before entry and move the course end date later by the same number of calendar days. The adjusted order is: adjusted course start at entry-date-minus-six-months, adjusted course end, entry.
   - Do not start every group automatically six months before entry. Change the approved period only when its start date is earlier than entry-date-minus-six-months.
-  - If the source period, interview-passed date, or entry date makes the case unclear, stop and ask the user before generating.
+  - If the source period or entry date makes the case unclear, stop and ask the user before generating.
 
 ## Output fidelity
 
